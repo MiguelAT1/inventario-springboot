@@ -1,0 +1,14 @@
+# IntelliJ
+.idea
+*.iml
+
+# Java / Spring
+build/
+.gradle/
+
+# Node / Angular
+node_modules/
+dist/
+
+# logs
+*.log
