@@ -20,10 +20,28 @@ public class ProveedorService {
         return proveedores;
     }
 
+
+
+
     public Proveedor buscarPorId(Long id) {
         return proveedores.stream()
                 .filter(p -> p.getId().equals(id))
                 .findFirst()
                 .orElse(null);
+    }
+
+    public Proveedor crear(Proveedor proveedor) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'crear'");
+    }
+
+    public Proveedor actualizar(Long id, Proveedor proveedor) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'actualizar'");
+    }
+
+    public boolean eliminar(Long id) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'eliminar'");
     }
 }
