@@ -20,9 +20,6 @@ public class ProveedorService {
         return proveedores;
     }
 
-
-
-
     public Proveedor buscarPorId(Long id) {
         return proveedores.stream()
                 .filter(p -> p.getId().equals(id))
