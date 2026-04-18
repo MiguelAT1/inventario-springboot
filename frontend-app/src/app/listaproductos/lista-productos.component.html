@@ -1,0 +1,98 @@
+<h2>Lista de Productos</h2>
+
+<div class="top-bar">
+  <input
+    type="number"
+    placeholder="Buscar por ID"
+    [(ngModel)]="filtroId"
+  >
+
+  <button (click)="buscarPorId()">🔍 Buscar</button>
+  <button (click)="cargar()">🔄 Ver todos</button>
+  <button routerLink="/nuevo">➕ Nuevo Registro</button>
+</div>
+
+<table>
+  <thead>
+  <tr>
+    <th>ID</th>
+    <th>Nombre</th>
+    <th>Stock</th>
+    <th>Precio</th>
+    <th>Estado</th>
+    <th>Ubicación</th>
+    <th>Proveedor</th>
+    <th>Acciones</th>
+  </tr>
+  </thead>
+
+  <tbody>
+  <tr *ngFor="let p of productos">
+    <td>{{ p.id }}</td>
+    <td>{{ p.nombre }}</td>
+    <td>{{ p.stock }}</td>
+    <td>{{ p.precio }}</td>
+    <td>{{ p.estado }}</td>
+    <td>{{ p.ubicacion }}</td>
+    <td>{{ p.proveedorId }}</td>
+    <td>
+      <button class="editar" (click)="editar(p.id)">✏ Editar</button>
+      <button class="entrada" (click)="abrirMovimiento(p.id, 'entrada')">⬆ Entrada</button>
+      <button class="salida" (click)="abrirMovimiento(p.id, 'salida')">⬇ Salida</button>
+      <button class="eliminar" (click)="eliminar(p.id)">🗑 Eliminar</button>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<div class="panel-movimiento" *ngIf="productoSeleccionadoId">
+  <h3>
+    {{ tipoMovimiento === 'entrada' ? 'Registrar entrada de stock' : 'Registrar salida de stock' }}
+  </h3>
+
+  <p>Producto seleccionado: {{ productoSeleccionadoId }}</p>
+
+  <input
+    type="number"
+    [(ngModel)]="movimientoForm.cantidad"
+    placeholder="Cantidad"
+  >
+
+  <input
+    type="text"
+    [(ngModel)]="movimientoForm.observacion"
+    placeholder="Observación"
+  >
+
+  <button class="guardar" (click)="guardarMovimiento()">Guardar movimiento</button>
+  <button class="cancelar" (click)="cancelarMovimiento()">Cancelar</button>
+</div>
+
+<h2>Historial de Movimientos</h2>
+
+<table *ngIf="movimientos.length > 0; else sinMovimientos">
+  <thead>
+  <tr>
+    <th>ID</th>
+    <th>Tipo</th>
+    <th>Cantidad</th>
+    <th>Fecha</th>
+    <th>Observación</th>
+    <th>Producto ID</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let m of movimientos">
+    <td>{{ m.id }}</td>
+    <td>{{ m.tipo }}</td>
+    <td>{{ m.cantidad }}</td>
+    <td>{{ m.fecha }}</td>
+    <td>{{ m.observacion }}</td>
+    <td>{{ m.productoId }}</td>
+  </tr>
+  </tbody>
+</table>
+
+<ng-template #sinMovimientos>
+  <p>No hay movimientos registrados todavía.</p>
+</ng-template>

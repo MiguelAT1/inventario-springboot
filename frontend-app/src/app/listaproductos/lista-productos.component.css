@@ -1,0 +1,94 @@
+h2 {
+  color: #38bdf8;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.top-bar {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.top-bar input {
+  padding: 8px;
+}
+
+.top-bar button {
+  background: #38bdf8;
+  color: black;
+  padding: 8px 12px;
+  border: none;
+  cursor: pointer;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+th {
+  background: #38bdf8;
+  color: black;
+  padding: 10px;
+}
+
+td {
+  text-align: center;
+  padding: 10px;
+  border-bottom: 1px solid #1f2937;
+}
+
+button {
+  margin: 2px;
+  padding: 6px 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.editar {
+  background: #22c55e;
+  color: white;
+}
+
+.eliminar {
+  background: #ef4444;
+  color: white;
+}
+
+.entrada {
+  background: #2563eb;
+  color: white;
+}
+
+.salida {
+  background: #f59e0b;
+  color: white;
+}
+
+.panel-movimiento {
+  border: 1px solid #38bdf8;
+  padding: 15px;
+  margin: 20px 0;
+  border-radius: 8px;
+}
+
+.panel-movimiento input {
+  display: block;
+  margin: 10px 0;
+  padding: 8px;
+  width: 300px;
+}
+
+.guardar {
+  background: #22c55e;
+  color: white;
+}
+
+.cancelar {
+  background: #6b7280;
+  color: white;
+}
