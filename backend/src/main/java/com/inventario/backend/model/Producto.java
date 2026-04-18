@@ -8,18 +8,20 @@ public class Producto {
     private double precio;
     private String estado;
     private String ubicacion;
+    private Long categoriaId;
     private Long proveedorId;
 
     public Producto() {
     }
 
-    public Producto(Long id, String nombre, int stock, double precio, String estado, String ubicacion, Long proveedorId) {
+    public Producto(Long id, String nombre, int stock, double precio, String estado, String ubicacion, Long categoriaId, Long proveedorId) {
         this.id = id;
         this.nombre = nombre;
         this.stock = stock;
         this.precio = precio;
         this.estado = estado;
         this.ubicacion = ubicacion;
+        this.categoriaId = categoriaId;
         this.proveedorId = proveedorId;
     }
 
@@ -69,6 +71,14 @@ public class Producto {
 
     public void setUbicacion(String ubicacion) {
         this.ubicacion = ubicacion;
+    }
+
+    public Long getCategoriaId() {
+        return categoriaId;
+    }
+
+    public void setCategoriaId(Long categoriaId) {
+        this.categoriaId = categoriaId;
     }
 
     public Long getProveedorId() {

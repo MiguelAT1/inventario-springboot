@@ -2,6 +2,8 @@ package com.inventario.backend.controller;
 
 import com.inventario.backend.model.Proveedor;
 import com.inventario.backend.service.ProveedorService;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,40 +13,65 @@ import java.util.List;
 @CrossOrigin
 public class ProveedorController {
 
-    private final ProveedorService proveedorService;
+    private final ProveedorService service;
 
-    public ProveedorController(ProveedorService proveedorService) {
-        this.proveedorService = proveedorService;
+    public ProveedorController(ProveedorService service) {
+        this.service = service;
     }
 
-    // CREAR proveedor
-    @PostMapping
-    public Proveedor crear(@RequestBody Proveedor proveedor) {
-        return proveedorService.crear(proveedor);
-    }
-
-    // LISTAR todos
     @GetMapping
-    public List<Proveedor> listar() {
-        return proveedorService.listar();
+    public ResponseEntity<List<Proveedor>> listar() {
+        var proveedores = service.listar();
+
+        if (proveedores.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok().body(proveedores);
     }
 
-    // BUSCAR por ID
     @GetMapping("/{id}")
-    public Proveedor buscar(@PathVariable Long id) {
-        return proveedorService.buscarPorId(id);
+    public ResponseEntity<Proveedor> buscar(@PathVariable Long id) {
+
+        var proveedor = service.buscarPorId(id);
+
+        if (proveedor == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok().body(proveedor);
     }
 
-    // ACTUALIZAR
+    @PostMapping
+    public ResponseEntity<Proveedor> crear(@RequestBody Proveedor proveedor) {
+        var createdProveedor = service.crear(proveedor);
+
+        if (createdProveedor == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok().body(createdProveedor);
+    }
+
     @PutMapping("/{id}")
-    public Proveedor actualizar(@PathVariable Long id,
-                                @RequestBody Proveedor proveedor) {
-        return proveedorService.actualizar(id, proveedor);
+    public ResponseEntity<Proveedor> actualizar(@PathVariable Long id, @RequestBody Proveedor proveedor) {
+        var updatedProveedor = service.actualizar(id, proveedor);
+
+        if (updatedProveedor == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok().body(updatedProveedor);
     }
 
-    // ELIMINAR
     @DeleteMapping("/{id}")
-    public boolean eliminar(@PathVariable Long id) {
-        return proveedorService.eliminar(id);
+    public ResponseEntity<Boolean> eliminar(@PathVariable Long id) {
+        var result = service.eliminar(id);
+
+        if (!result) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok().body(result);
     }
 }

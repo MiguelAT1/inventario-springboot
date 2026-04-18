@@ -1,9 +1,10 @@
 package com.inventario.backend.controller;
 
 import com.inventario.backend.model.Producto;
-import com.inventario.backend.model.Proveedor;
+import com.inventario.backend.dto.ProductoDTO;
 import com.inventario.backend.service.ProductoService;
-import com.inventario.backend.service.ProveedorService;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,45 +15,74 @@ import java.util.List;
 public class ProductoController {
 
     private final ProductoService productoService;
-    private final ProveedorService proveedorService;
 
-    public ProductoController(ProductoService productoService, ProveedorService proveedorService) {
+    public ProductoController(ProductoService productoService) {
         this.productoService = productoService;
-        this.proveedorService = proveedorService;
     }
 
     @PostMapping
-    public Producto crear(@RequestBody Producto producto) {
-        return productoService.crear(producto);
+    public ResponseEntity<Producto> crear(@RequestBody Producto producto) {
+        var createdProducto = productoService.crear(producto);
+
+        if (createdProducto == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok().body(createdProducto);
     }
 
     @GetMapping
-    public List<Producto> listar() {
-        return productoService.listar();
+    public ResponseEntity<List<ProductoDTO>> listar() {
+        var productos = productoService.listar();
+
+        if (productos.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok().body(productos);
     }
 
     @GetMapping("/{id}")
-    public Producto buscar(@PathVariable Long id) {
-        return productoService.buscarPorId(id);
+    public ResponseEntity<Producto> buscar(@PathVariable("id") Long id) {
+        var producto = productoService.buscarPorId(id);
+
+        if (producto == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok().body(producto);
     }
 
     @PutMapping("/{id}")
-    public Producto actualizar(@PathVariable Long id, @RequestBody Producto producto) {
-        return productoService.actualizar(id, producto);
+    public ResponseEntity<Producto> actualizar(@PathVariable("id") Long id, @RequestBody Producto producto) {
+        var updatedProducto = productoService.actualizar(id, producto);
+
+        if (updatedProducto == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok().body(updatedProducto);
     }
 
     @DeleteMapping("/{id}")
-    public boolean eliminar(@PathVariable Long id) {
-        return productoService.eliminar(id);
+    public ResponseEntity<Boolean> eliminar(@PathVariable("id") Long id) {
+        var result = productoService.eliminar(id);
+
+        if (!result) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok().body(result);
     }
 
     @GetMapping("/bajo-stock/{limite}")
-    public List<Producto> bajoStock(@PathVariable int limite) {
-        return productoService.listarBajoStock(limite);
-    }
+    public ResponseEntity<List<Producto>> bajoStock(@PathVariable int limite) {
+        var productos = productoService.listarBajoStock(limite);
 
-    @GetMapping("/proveedores")
-    public List<Proveedor> listarProveedores() {
-        return proveedorService.listar();
+        if (productos.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok().body(productos);
     }
 }
