@@ -3,6 +3,8 @@ package com.inventario.backend.controller;
 import com.inventario.backend.dto.SolicitudMovimiento;
 import com.inventario.backend.model.MovimientoInventario;
 import com.inventario.backend.service.MovimientoInventarioService;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,22 +21,46 @@ public class MovimientoInventarioController {
     }
 
     @PostMapping("/entrada")
-    public MovimientoInventario registrarEntrada(@RequestBody SolicitudMovimiento solicitud) {
-        return movimientoInventarioService.registrarEntrada(solicitud);
+    public ResponseEntity<MovimientoInventario> registrarEntrada(@RequestBody SolicitudMovimiento solicitud) {
+        var movimiento = movimientoInventarioService.registrarEntrada(solicitud);
+
+        if (movimiento == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok().body(movimiento);
     }
 
     @PostMapping("/salida")
-    public MovimientoInventario registrarSalida(@RequestBody SolicitudMovimiento solicitud) {
-        return movimientoInventarioService.registrarSalida(solicitud);
+    public ResponseEntity<MovimientoInventario> registrarSalida(@RequestBody SolicitudMovimiento solicitud) {
+        var movimiento = movimientoInventarioService.registrarSalida(solicitud);
+
+        if (movimiento == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok().body(movimiento);
     }
 
     @GetMapping
-    public List<MovimientoInventario> listar() {
-        return movimientoInventarioService.listar();
+    public ResponseEntity<List<MovimientoInventario>> listar() {
+        var movimientos = movimientoInventarioService.listar();
+
+        if (movimientos.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok().body(movimientos);
     }
 
     @GetMapping("/producto/{productoId}")
-    public List<MovimientoInventario> listarPorProducto(@PathVariable Long productoId) {
-        return movimientoInventarioService.listarPorProducto(productoId);
+    public ResponseEntity<List<MovimientoInventario>> listarPorProducto(@PathVariable Long productoId) {
+        var movimientos = movimientoInventarioService.listarPorProducto(productoId);
+
+        if (movimientos.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok().body(movimientos);
     }
 }

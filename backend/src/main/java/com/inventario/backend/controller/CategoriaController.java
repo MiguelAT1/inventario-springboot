@@ -2,6 +2,8 @@ package com.inventario.backend.controller;
 
 import com.inventario.backend.model.Categoria;
 import com.inventario.backend.service.CategoriaService;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,27 +20,62 @@ public class CategoriaController {
     }
 
     @PostMapping
-    public Categoria crear(@RequestBody Categoria categoria) {
-        return categoriaService.crear(categoria);
+    public ResponseEntity<Categoria> crear(@RequestBody Categoria categoria) {
+
+        var createdCategoria = categoriaService.crear(categoria);
+
+        if (createdCategoria == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        
+        return ResponseEntity.ok().body(createdCategoria);
     }
 
     @GetMapping
-    public List<Categoria> listar() {
-        return categoriaService.listar();
+    public ResponseEntity<List<Categoria>> listar() {
+
+        var categorias = categoriaService.listar();
+
+        if (categorias.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok().body(categorias);
     }
 
     @GetMapping("/{id}")
-    public Categoria buscar(@PathVariable Long id) {
-        return categoriaService.buscarPorId(id);
+    public ResponseEntity<Categoria> buscar(@PathVariable Long id) {
+        
+        var categoria = categoriaService.buscarPorId(id);
+
+        if (categoria == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok().body(categoria);
     }
 
     @PutMapping("/{id}")
-    public Categoria actualizar(@PathVariable Long id, @RequestBody Categoria categoria) {
-        return categoriaService.actualizar(id, categoria);
+    public ResponseEntity<Categoria> actualizar(@PathVariable Long id, @RequestBody Categoria categoria) {
+        
+        var updatedCategoria = categoriaService.actualizar(id, categoria);
+
+        if (updatedCategoria == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok().body(updatedCategoria);
     }
 
     @DeleteMapping("/{id}")
-    public boolean eliminar(@PathVariable Long id) {
-        return categoriaService.eliminar(id);
+    public ResponseEntity<Boolean> eliminar(@PathVariable Long id) {
+
+        var result = categoriaService.eliminar(id);
+
+        if (!result) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok().body(result);
     }
 }
