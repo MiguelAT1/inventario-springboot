@@ -22,13 +22,17 @@ public class ProductoController {
 
     @PostMapping
     public ResponseEntity<Producto> crear(@RequestBody Producto producto) {
-        var createdProducto = productoService.crear(producto);
+        try {
+            var createdProducto = productoService.crear(producto);
 
-        if (createdProducto == null) {
+            if (createdProducto == null) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            return ResponseEntity.ok().body(createdProducto);
+        } catch (Exception e) {
             return ResponseEntity.badRequest().build();
         }
-
-        return ResponseEntity.ok().body(createdProducto);
     }
 
     @GetMapping
