@@ -31,7 +31,7 @@ public class ProveedorController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Proveedor> buscar(@PathVariable Long id) {
+    public ResponseEntity<Proveedor> buscar(@PathVariable("id") Long id) {
 
         var proveedor = service.buscarPorId(id);
 
@@ -54,7 +54,7 @@ public class ProveedorController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Proveedor> actualizar(@PathVariable Long id, @RequestBody Proveedor proveedor) {
+    public ResponseEntity<Proveedor> actualizar(@PathVariable("id") Long id, @RequestBody Proveedor proveedor) {
         var updatedProveedor = service.actualizar(id, proveedor);
 
         if (updatedProveedor == null) {
@@ -65,7 +65,7 @@ public class ProveedorController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> eliminar(@PathVariable Long id) {
+    public ResponseEntity<Boolean> eliminar(@PathVariable("id") Long id) {
         var result = service.eliminar(id);
 
         if (!result) {

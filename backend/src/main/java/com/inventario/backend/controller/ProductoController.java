@@ -80,7 +80,7 @@ public class ProductoController {
     }
 
     @GetMapping("/bajo-stock/{limite}")
-    public ResponseEntity<List<Producto>> bajoStock(@PathVariable int limite) {
+    public ResponseEntity<List<Producto>> bajoStock(@PathVariable("limite") int limite) {
         var productos = productoService.listarBajoStock(limite);
 
         if (productos.isEmpty()) {

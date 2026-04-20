@@ -54,7 +54,7 @@ public class MovimientoInventarioController {
     }
 
     @GetMapping("/producto/{productoId}")
-    public ResponseEntity<List<MovimientoInventario>> listarPorProducto(@PathVariable Long productoId) {
+    public ResponseEntity<List<MovimientoInventario>> listarPorProducto(@PathVariable("productoId") Long productoId) {
         var movimientos = movimientoInventarioService.listarPorProducto(productoId);
 
         if (movimientos.isEmpty()) {
