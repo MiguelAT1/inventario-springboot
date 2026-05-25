@@ -2,7 +2,6 @@ package com.inventario.backend.controller;
 
 import com.inventario.backend.model.Categoria;
 import com.inventario.backend.service.CategoriaService;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,61 +20,61 @@ public class CategoriaController {
 
     @PostMapping
     public ResponseEntity<Categoria> crear(@RequestBody Categoria categoria) {
-
-        var createdCategoria = categoriaService.crear(categoria);
+        Categoria createdCategoria = categoriaService.crear(categoria);
 
         if (createdCategoria == null) {
             return ResponseEntity.badRequest().build();
         }
-        
-        return ResponseEntity.ok().body(createdCategoria);
+
+        return ResponseEntity.ok(createdCategoria);
     }
 
     @GetMapping
     public ResponseEntity<List<Categoria>> listar() {
-
-        var categorias = categoriaService.listar();
+        List<Categoria> categorias = categoriaService.listar();
 
         if (categorias.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
 
-        return ResponseEntity.ok().body(categorias);
+        return ResponseEntity.ok(categorias);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Categoria> buscar(@PathVariable("id") Long id) {
-        
-        var categoria = categoriaService.buscarPorId(id);
+
+        Categoria categoria = categoriaService.buscarPorId(id);
 
         if (categoria == null) {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok().body(categoria);
+        return ResponseEntity.ok(categoria);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Categoria> actualizar(@PathVariable("id") Long id, @RequestBody Categoria categoria) {
-        
-        var updatedCategoria = categoriaService.actualizar(id, categoria);
+    public ResponseEntity<Categoria> actualizar(
+            @PathVariable("id") Long id,
+            @RequestBody Categoria categoria) {
+
+        Categoria updatedCategoria = categoriaService.actualizar(id, categoria);
 
         if (updatedCategoria == null) {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok().body(updatedCategoria);
+        return ResponseEntity.ok(updatedCategoria);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> eliminar(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> eliminar(@PathVariable("id") Long id) {
 
-        var result = categoriaService.eliminar(id);
+        boolean eliminado = categoriaService.eliminar(id);
 
-        if (!result) {
+        if (!eliminado) {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok().body(result);
+        return ResponseEntity.noContent().build();
     }
 }

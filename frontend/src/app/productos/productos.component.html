@@ -1,0 +1,92 @@
+<h1>Productos</h1>
+<button *ngIf="esAdmin" routerLink="/movimientos" class="primary">Ver Movimientos</button>
+<div style="margin: 20px 0;">
+  <input 
+    type="number" 
+    placeholder="Buscar por ID" 
+    [(ngModel)]="searchId"
+    (keyup.enter)="filtrarPorId()"
+    style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;"
+  />
+  <button (click)="filtrarPorId()" class="primary">Buscar</button>
+  <button (click)="verTodos()" class="primary">Ver Todos</button>
+</div>
+<div *ngIf="mensaje" class="message">{{ mensaje }}</div>
+<table *ngIf="productos.length > 0">
+  <thead>
+    <tr>
+      <th>Id</th>
+      <th>Nombre</th>
+      <th>Stock</th>
+      <th>Precio</th>
+      <th>Estado</th>
+      <th>Ubicación</th>
+      <th>Categoría</th>
+      <th>Proveedor</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let producto of productos">
+      <td>{{ producto.id }}</td>
+      <td>{{ producto.nombre }}</td>
+      <td>{{ producto.stock }}</td>
+      <td>{{ producto.precio | number:'1.2-2' }}</td>
+      <td>{{ producto.estado }}</td>
+      <td>{{ producto.ubicacion }}</td>
+      <td>{{ producto.categoria }}</td>
+      <td>{{ producto.proveedor }}</td>
+      <td>
+        <button class="primary" type="button" (click)="editarProducto(producto.id)">Editar</button>
+        <button class="danger" type="button" (click)="eliminarProducto(producto.id)">Eliminar</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<form (ngSubmit)="guardar()">
+  <h2>{{ productoForm.id ? 'Editar producto' : 'Crear producto' }}</h2>
+  <label>
+    Nombre
+    <input name="nombre" [(ngModel)]="productoForm.nombre" required />
+  </label>
+
+  <label>
+    Stock
+    <input name="stock" type="number" [(ngModel)]="productoForm.stock" required />
+  </label>
+
+  <label>
+    Precio
+    <input name="precio" type="number" step="0.01" [(ngModel)]="productoForm.precio" required />
+  </label>
+
+  <label>
+    Estado
+    <input name="estado" [(ngModel)]="productoForm.estado" required />
+  </label>
+
+  <label>
+    Ubicación
+    <input name="ubicacion" [(ngModel)]="productoForm.ubicacion" required />
+  </label>
+
+  <label>
+    Categoría
+    <select name="categoriaId" [(ngModel)]="productoForm.categoriaId" required>
+      <option value="0">Seleccione categoría</option>
+      <option *ngFor="let categoria of categorias" [value]="categoria.id">{{ categoria.nombre }}</option>
+    </select>
+  </label>
+
+  <label>
+    Proveedor
+    <select name="proveedorId" [(ngModel)]="productoForm.proveedorId" required>
+      <option value="0">Seleccione proveedor</option>
+      <option *ngFor="let proveedor of proveedores" [value]="proveedor.id">{{ proveedor.nombre }}</option>
+    </select>
+  </label>
+
+  <button class="primary" type="submit">{{ productoForm.id ? 'Guardar cambios' : 'Crear producto' }}</button>
+  <button type="button" (click)="cancelarEdicion()">Cancelar</button>
+</form>

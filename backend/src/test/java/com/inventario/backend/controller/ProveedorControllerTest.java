@@ -1,113 +1,208 @@
 package com.inventario.backend.controller;
 
+import com.inventario.backend.model.Proveedor;
+import com.inventario.backend.service.ProveedorService;
+
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 
+import org.springframework.http.MediaType;
 
-import org.springframework.http.HttpStatus;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.mockito.Mockito.when;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@AutoConfigureMockMvc
-class ProveedorControllerTest {
+@AutoConfigureMockMvc(addFilters = false)
+public class ProveedorControllerTest {
 
     @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
+
+    @MockitoBean
+    private ProveedorService service;
 
     @Test
-    public void testListarProveedores_RespuestaCorrecta() throws Exception {
+    void listarProveedores() throws Exception {
 
-        MvcResult result = mockMvc.perform(
-                MockMvcRequestBuilders.get("/proveedores")
-        ).andReturn();
+        List<Proveedor> proveedores = new ArrayList<>();
 
-        assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus());
+        when(service.listar()).thenReturn(proveedores);
+
+        mockMvc.perform(
+                get("/proveedores")
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+        .andExpect(status().isNoContent());
     }
 
     @Test
-    public void testCrearProveedor_RespuestaCorrecta() throws Exception {
+    void listarProveedoresConDatos() throws Exception {
 
-        MvcResult result = mockMvc.perform(
-                MockMvcRequestBuilders.post("/proveedores")
-                        .contentType("application/json")
-                        .content("{\"nombre\":\"Tech Import\"}")
-        ).andReturn();
+        List<Proveedor> proveedores = new ArrayList<>();
 
-        assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus());
+        Proveedor proveedor = new Proveedor();
+        proveedor.setId(1L);
+
+        proveedores.add(proveedor);
+
+        when(service.listar()).thenReturn(proveedores);
+
+        mockMvc.perform(
+                get("/proveedores")
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+        .andExpect(status().isOk());
     }
 
     @Test
-    public void testEliminarProveedor_RespuestaCorrecta() throws Exception {
+    void buscarProveedorExistente() throws Exception {
 
-        MvcResult resultCrear = mockMvc.perform(
-                MockMvcRequestBuilders.post("/proveedores")
-                        .contentType("application/json")
-                        .content("{\"nombre\":\"Tech Import\",\"telefono\":\"999111222\",\"correo\":\"tech@correo.com\",\"direccion\":\"Lima\"}")
-        ).andReturn();
+        Proveedor proveedor = new Proveedor();
+        proveedor.setId(1L);
 
-        String response = resultCrear.getResponse().getContentAsString();
+        when(service.buscarPorId(1L))
+                .thenReturn(proveedor);
 
-        String id = response.substring(
-                response.indexOf("\"id\":") + 5,
-                response.indexOf(",", response.indexOf("\"id\":"))
-        ).trim();
-
-        MvcResult resultEliminar = mockMvc.perform(
-                MockMvcRequestBuilders.delete("/proveedores/" + id)
-        ).andReturn();
-
-        assertEquals(HttpStatus.OK.value(), resultEliminar.getResponse().getStatus());
+        mockMvc.perform(
+                get("/proveedores/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+        .andExpect(status().isOk());
     }
+
     @Test
-    public void testBuscarProveedor_RespuestaCorrecta() throws Exception {
+    void buscarProveedorInexistente() throws Exception {
 
-        MvcResult resultCrear = mockMvc.perform(
-                MockMvcRequestBuilders.post("/proveedores")
-                        .contentType("application/json")
-                        .content("{\"nombre\":\"Tech Import\",\"telefono\":\"999111222\",\"correo\":\"tech@correo.com\",\"direccion\":\"Lima\"}")
-        ).andReturn();
+        when(service.buscarPorId(99L))
+                .thenReturn(null);
 
-        String response = resultCrear.getResponse().getContentAsString();
-
-        String id = response.substring(
-                response.indexOf("\"id\":") + 5,
-                response.indexOf(",", response.indexOf("\"id\":"))
-        ).trim();
-
-        MvcResult resultBuscar = mockMvc.perform(
-                MockMvcRequestBuilders.get("/proveedores/" + id)
-        ).andReturn();
-
-        assertEquals(HttpStatus.OK.value(), resultBuscar.getResponse().getStatus());
+        mockMvc.perform(
+                get("/proveedores/99")
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+        .andExpect(status().isNotFound());
     }
+
     @Test
-    public void testActualizarProveedor_RespuestaCorrecta() throws Exception {
+    void crearProveedor() throws Exception {
 
-        MvcResult resultCrear = mockMvc.perform(
-                MockMvcRequestBuilders.post("/proveedores")
-                        .contentType("application/json")
-                        .content("{\"nombre\":\"Tech Import\",\"telefono\":\"999111222\",\"correo\":\"tech@correo.com\",\"direccion\":\"Lima\"}")
-        ).andReturn();
+        Proveedor proveedor = new Proveedor();
+        proveedor.setId(1L);
 
-        String response = resultCrear.getResponse().getContentAsString();
+        when(service.crear(
+                org.mockito.ArgumentMatchers.any(Proveedor.class)
+        )).thenReturn(proveedor);
 
-        String id = response.substring(
-                response.indexOf("\"id\":") + 5,
-                response.indexOf(",", response.indexOf("\"id\":"))
-        ).trim();
+        mockMvc.perform(
+                post("/proveedores")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "nombre":"Tech Supplier"
+                                }
+                                """)
+        )
+        .andExpect(status().isOk());
+    }
 
-        MvcResult resultActualizar = mockMvc.perform(
-                MockMvcRequestBuilders.put("/proveedores/" + id)
-                        .contentType("application/json")
-                        .content("{\"nombre\":\"Tech Import Actualizado\",\"telefono\":\"111222333\",\"correo\":\"nuevo@correo.com\",\"direccion\":\"Arequipa\"}")
-        ).andReturn();
+    @Test
+    void crearProveedorInvalido() throws Exception {
 
-        assertEquals(HttpStatus.OK.value(), resultActualizar.getResponse().getStatus());
+        when(service.crear(
+                org.mockito.ArgumentMatchers.any(Proveedor.class)
+        )).thenReturn(null);
+
+        mockMvc.perform(
+                post("/proveedores")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "nombre":""
+                                }
+                                """)
+        )
+        .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void actualizarProveedorExistente() throws Exception {
+
+        Proveedor proveedor = new Proveedor();
+        proveedor.setId(1L);
+
+        when(service.actualizar(
+                org.mockito.ArgumentMatchers.eq(1L),
+                org.mockito.ArgumentMatchers.any(Proveedor.class)
+        )).thenReturn(proveedor);
+
+        mockMvc.perform(
+                put("/proveedores/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "nombre":"Proveedor Actualizado"
+                                }
+                                """)
+        )
+        .andExpect(status().isOk());
+    }
+
+    @Test
+    void actualizarProveedorInexistente() throws Exception {
+
+        when(service.actualizar(
+                org.mockito.ArgumentMatchers.eq(99L),
+                org.mockito.ArgumentMatchers.any(Proveedor.class)
+        )).thenReturn(null);
+
+        mockMvc.perform(
+                put("/proveedores/99")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "nombre":"Fantasma"
+                                }
+                                """)
+        )
+        .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void eliminarProveedorExistente() throws Exception {
+
+        when(service.eliminar(1L))
+                .thenReturn(true);
+
+        mockMvc.perform(
+                delete("/proveedores/1")
+        )
+        .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void eliminarProveedorInexistente() throws Exception {
+
+        when(service.eliminar(99L))
+                .thenReturn(false);
+
+        mockMvc.perform(
+                delete("/proveedores/99")
+        )
+        .andExpect(status().isNotFound());
     }
 }

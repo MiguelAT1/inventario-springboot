@@ -2,7 +2,6 @@ package com.inventario.backend.controller;
 
 import com.inventario.backend.model.Proveedor;
 import com.inventario.backend.service.ProveedorService;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,57 +20,63 @@ public class ProveedorController {
 
     @GetMapping
     public ResponseEntity<List<Proveedor>> listar() {
-        var proveedores = service.listar();
+
+        List<Proveedor> proveedores = service.listar();
 
         if (proveedores.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
 
-        return ResponseEntity.ok().body(proveedores);
+        return ResponseEntity.ok(proveedores);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Proveedor> buscar(@PathVariable("id") Long id) {
 
-        var proveedor = service.buscarPorId(id);
+        Proveedor proveedor = service.buscarPorId(id);
 
         if (proveedor == null) {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok().body(proveedor);
+        return ResponseEntity.ok(proveedor);
     }
 
     @PostMapping
     public ResponseEntity<Proveedor> crear(@RequestBody Proveedor proveedor) {
-        var createdProveedor = service.crear(proveedor);
+
+        Proveedor createdProveedor = service.crear(proveedor);
 
         if (createdProveedor == null) {
             return ResponseEntity.badRequest().build();
         }
 
-        return ResponseEntity.ok().body(createdProveedor);
+        return ResponseEntity.ok(createdProveedor);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Proveedor> actualizar(@PathVariable("id") Long id, @RequestBody Proveedor proveedor) {
-        var updatedProveedor = service.actualizar(id, proveedor);
+    public ResponseEntity<Proveedor> actualizar(
+            @PathVariable("id") Long id,
+            @RequestBody Proveedor proveedor) {
+
+        Proveedor updatedProveedor = service.actualizar(id, proveedor);
 
         if (updatedProveedor == null) {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok().body(updatedProveedor);
+        return ResponseEntity.ok(updatedProveedor);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> eliminar(@PathVariable("id") Long id) {
-        var result = service.eliminar(id);
+    public ResponseEntity<Void> eliminar(@PathVariable("id") Long id) {
 
-        if (!result) {
+        boolean eliminado = service.eliminar(id);
+
+        if (!eliminado) {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok().body(result);
+        return ResponseEntity.noContent().build();
     }
 }
