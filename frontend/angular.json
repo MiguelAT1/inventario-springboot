@@ -1,0 +1,51 @@
+{
+  "$schema": "https://angular.io/schema/angular.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "inventario-frontend": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "",
+      "sourceRoot": "src",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/frontend",
+            "index": "src/index.html",
+            "main": "src/main.ts",
+            "polyfills": [],
+            "tsConfig": "tsconfig.app.json",
+            "assets": ["src/favicon.ico"],
+            "styles": ["src/styles.css"],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "vendorChunk": false,
+              "buildOptimizer": true
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "inventario-frontend:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "inventario-frontend:build:production"
+            }
+          }
+        }
+      }
+    }
+  },
+  "defaultProject": "inventario-frontend"
+}

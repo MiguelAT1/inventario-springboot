@@ -1,26 +1,37 @@
 package com.inventario.backend.model;
 
+import jakarta.persistence.*;
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "movimiento_inventario")
 public class MovimientoInventario {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String tipo;
     private int cantidad;
     private LocalDate fecha;
     private String observacion;
-    private Long productoId;
+
+    @ManyToOne
+    @JoinColumn(name = "producto_id")
+    private Producto producto;
 
     public MovimientoInventario() {
     }
 
-    public MovimientoInventario(Long id, String tipo, int cantidad, LocalDate fecha, String observacion, Long productoId) {
+    public MovimientoInventario(Long id, String tipo, int cantidad,
+                                LocalDate fecha, String observacion,
+                                Producto producto) {
         this.id = id;
         this.tipo = tipo;
         this.cantidad = cantidad;
         this.fecha = fecha;
         this.observacion = observacion;
-        this.productoId = productoId;
+        this.producto = producto;
     }
 
     public Long getId() {
@@ -63,11 +74,11 @@ public class MovimientoInventario {
         this.observacion = observacion;
     }
 
-    public Long getProductoId() {
-        return productoId;
+    public Producto getProducto() {
+        return producto;
     }
 
-    public void setProductoId(Long productoId) {
-        this.productoId = productoId;
+    public void setProducto(Producto producto) {
+        this.producto = producto;
     }
 }

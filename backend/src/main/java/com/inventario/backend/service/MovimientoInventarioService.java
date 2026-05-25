@@ -3,77 +3,73 @@ package com.inventario.backend.service;
 import com.inventario.backend.dto.SolicitudMovimiento;
 import com.inventario.backend.model.MovimientoInventario;
 import com.inventario.backend.model.Producto;
+import com.inventario.backend.repository.MovimientoInventarioRepository;
+import com.inventario.backend.repository.ProductoRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class MovimientoInventarioService {
 
-    private final List<MovimientoInventario> movimientos = new ArrayList<>();
-    private Long contadorId = 1L;
+    private final MovimientoInventarioRepository movimientoRepository;
+    private final ProductoRepository productoRepository;
 
-    private final ProductoService productoService;
-
-    public MovimientoInventarioService(ProductoService productoService) {
-        this.productoService = productoService;
+    public MovimientoInventarioService(MovimientoInventarioRepository movimientoRepository,
+                                       ProductoRepository productoRepository) {
+        this.movimientoRepository = movimientoRepository;
+        this.productoRepository = productoRepository;
     }
 
     public MovimientoInventario registrarEntrada(SolicitudMovimiento solicitud) {
-        Producto producto = productoService.aumentarStock(solicitud.getProductoId(), solicitud.getCantidad());
 
-        if (producto == null) {
-            throw new RuntimeException("No se pudo registrar la entrada");
-        }
+        Producto producto = productoRepository.findById(solicitud.getProductoId())
+                .orElseThrow(() -> new RuntimeException("Producto no existe"));
 
-        MovimientoInventario movimiento = new MovimientoInventario(
-                contadorId++,
-                "ENTRADA",
-                solicitud.getCantidad(),
-                LocalDate.now(),
-                solicitud.getObservacion(),
-                solicitud.getProductoId()
-        );
+        producto.setStock(producto.getStock() + solicitud.getCantidad());
+        productoRepository.save(producto);
 
-        movimientos.add(movimiento);
-        return movimiento;
+        MovimientoInventario movimiento = new MovimientoInventario();
+        movimiento.setTipo("ENTRADA");
+        movimiento.setCantidad(solicitud.getCantidad());
+        movimiento.setFecha(LocalDate.now());
+        movimiento.setObservacion(solicitud.getObservacion());
+        movimiento.setProducto(producto);
+
+        return movimientoRepository.save(movimiento);
     }
 
     public MovimientoInventario registrarSalida(SolicitudMovimiento solicitud) {
-        Producto producto = productoService.disminuirStock(solicitud.getProductoId(), solicitud.getCantidad());
 
-        if (producto == null) {
-            throw new RuntimeException("No se pudo registrar la salida");
+        Producto producto = productoRepository.findById(solicitud.getProductoId())
+                .orElseThrow(() -> new RuntimeException("Producto no existe"));
+
+        if (producto.getStock() < solicitud.getCantidad()) {
+            throw new RuntimeException("Stock insuficiente");
         }
 
-        MovimientoInventario movimiento = new MovimientoInventario(
-                contadorId++,
-                "SALIDA",
-                solicitud.getCantidad(),
-                LocalDate.now(),
-                solicitud.getObservacion(),
-                solicitud.getProductoId()
-        );
+        producto.setStock(producto.getStock() - solicitud.getCantidad());
+        productoRepository.save(producto);
 
-        movimientos.add(movimiento);
-        return movimiento;
+        MovimientoInventario movimiento = new MovimientoInventario();
+        movimiento.setTipo("SALIDA");
+        movimiento.setCantidad(solicitud.getCantidad());
+        movimiento.setFecha(LocalDate.now());
+        movimiento.setObservacion(solicitud.getObservacion());
+        movimiento.setProducto(producto);
+
+        return movimientoRepository.save(movimiento);
     }
 
     public List<MovimientoInventario> listar() {
-        return movimientos;
+        return movimientoRepository.findAll();
     }
 
     public List<MovimientoInventario> listarPorProducto(Long productoId) {
-        List<MovimientoInventario> resultado = new ArrayList<>();
-
-        for (MovimientoInventario movimiento : movimientos) {
-            if (movimiento.getProductoId().equals(productoId)) {
-                resultado.add(movimiento);
-            }
-        }
-
-        return resultado;
+        return movimientoRepository.findAll()
+                .stream()
+                .filter(m -> m.getProducto().getId().equals(productoId))
+                .toList();
     }
 }

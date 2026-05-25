@@ -1,28 +1,50 @@
 package com.inventario.backend.model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "producto")
 public class Producto {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String nombre;
     private int stock;
     private double precio;
     private String estado;
     private String ubicacion;
-    private Long categoriaId;
-    private Long proveedorId;
+
+    @ManyToOne
+    @JoinColumn(name = "categoria_id")
+    private Categoria categoria;
+
+    @ManyToOne
+    @JoinColumn(name = "proveedor_id")
+    private Proveedor proveedor;
 
     public Producto() {
     }
 
-    public Producto(Long id, String nombre, int stock, double precio, String estado, String ubicacion, Long categoriaId, Long proveedorId) {
+    public Producto(Long id, String nombre, int stock, double precio,
+                    String estado, String ubicacion,
+                    Categoria categoria, Proveedor proveedor) {
+
         this.id = id;
         this.nombre = nombre;
         this.stock = stock;
         this.precio = precio;
         this.estado = estado;
         this.ubicacion = ubicacion;
-        this.categoriaId = categoriaId;
-        this.proveedorId = proveedorId;
+        this.categoria = categoria;
+        this.proveedor = proveedor;
     }
 
     public Long getId() {
@@ -73,19 +95,19 @@ public class Producto {
         this.ubicacion = ubicacion;
     }
 
-    public Long getCategoriaId() {
-        return categoriaId;
+    public Categoria getCategoria() {
+        return categoria;
     }
 
-    public void setCategoriaId(Long categoriaId) {
-        this.categoriaId = categoriaId;
+    public void setCategoria(Categoria categoria) {
+        this.categoria = categoria;
     }
 
-    public Long getProveedorId() {
-        return proveedorId;
+    public Proveedor getProveedor() {
+        return proveedor;
     }
 
-    public void setProveedorId(Long proveedorId) {
-        this.proveedorId = proveedorId;
+    public void setProveedor(Proveedor proveedor) {
+        this.proveedor = proveedor;
     }
 }

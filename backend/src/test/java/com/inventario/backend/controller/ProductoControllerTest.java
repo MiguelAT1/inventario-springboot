@@ -1,123 +1,235 @@
 package com.inventario.backend.controller;
 
+import com.inventario.backend.model.Producto;
+import com.inventario.backend.service.ProductoService;
+
 import org.junit.jupiter.api.Test;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 
-import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
-import java.net.URI;
+import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@AutoConfigureMockMvc
-class ProductoControllerTest {
+@AutoConfigureMockMvc(addFilters = false)
+public class ProductoControllerTest {
 
     @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
+
+    @MockitoBean
+    private ProductoService productoService;
+
     @Test
-    public void testListarProductos_RespuestaCorrecta() throws Exception {
+    void crearProducto() throws Exception {
 
-        URI uri = new URI("/productos");
+        Producto producto = new Producto();
+        producto.setId(1L);
 
-        MockHttpServletRequestBuilder req =
-                MockMvcRequestBuilders.get(uri);
+        when(productoService.crear(org.mockito.ArgumentMatchers.any(Producto.class)))
+                .thenReturn(producto);
 
-        MvcResult result = mockMvc.perform(req).andReturn();
+        when(productoService.convertirADTO(org.mockito.ArgumentMatchers.any(Producto.class)))
+                .thenReturn(null);
 
-        assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus());
+        mockMvc.perform(
+                post("/productos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "nombre":"Laptop Gamer",
+                                    "precio":1500,
+                                    "stock":10
+                                }
+                                """)
+        )
+        .andExpect(status().isOk());
     }
 
     @Test
-    public void testCrearProducto_RespuestaCorrecta() throws Exception {
+    void listarProductos() throws Exception {
 
-        URI uri = new URI("/productos");
+        when(productoService.listar()).thenReturn(new ArrayList<>());
 
-        MockHttpServletRequestBuilder req =
-                MockMvcRequestBuilders.post(uri)
-                        .contentType("application/json")
-                        .content("{\"nombre\":\"Laptop\",\"stock\":10,\"precio\":1500.0,\"estado\":\"ACTIVO\",\"ubicacion\":\"ALMACEN\",\"categoriaId\":1,\"proveedorId\":1}");
-
-        MvcResult result = mockMvc.perform(req).andReturn();
-
-        assertEquals(HttpStatus.OK.value(), result.getResponse().getStatus());
+        mockMvc.perform(
+                get("/productos")
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+        .andExpect(status().isOk());
     }
 
     @Test
-    public void testEliminarProducto_RespuestaCorrecta() throws Exception {
+    void buscarProductoExistente() throws Exception {
 
-        MvcResult resultCrear = mockMvc.perform(
-                MockMvcRequestBuilders.post("/productos")
-                        .contentType("application/json")
-                        .content("{\"nombre\":\"Laptop\",\"stock\":10,\"precio\":1500.0,\"estado\":\"ACTIVO\",\"ubicacion\":\"ALMACEN\",\"categoriaId\":1,\"proveedorId\":1}")
-        ).andReturn();
+        Producto producto = new Producto();
+        producto.setId(1L);
 
-        String response = resultCrear.getResponse().getContentAsString();
+        when(productoService.buscarPorId(1L)).thenReturn(producto);
 
-        String id = response.substring(
-                response.indexOf("\"id\":") + 5,
-                response.indexOf(",", response.indexOf("\"id\":"))
-        ).trim();
-
-        MvcResult resultEliminar = mockMvc.perform(
-                MockMvcRequestBuilders.delete("/productos/" + id)
-        ).andReturn();
-
-        assertEquals(HttpStatus.OK.value(), resultEliminar.getResponse().getStatus());
-    }
- 
-    @Test
-    public void testActualizarProducto_RespuestaCorrecta() throws Exception {
-
-        MvcResult resultCrear = mockMvc.perform(
-                MockMvcRequestBuilders.post("/productos")
-                        .contentType("application/json")
-                        .content("{\"nombre\":\"Laptop\",\"stock\":10,\"precio\":1500.0,\"estado\":\"ACTIVO\",\"ubicacion\":\"ALMACEN\",\"categoriaId\":1,\"proveedorId\":1}")
-        ).andReturn();
-
-        String response = resultCrear.getResponse().getContentAsString();
-
-        String id = response.substring(
-                response.indexOf("\"id\":") + 5,
-                response.indexOf(",", response.indexOf("\"id\":"))
-        ).trim();
-
-        MvcResult resultActualizar = mockMvc.perform(
-                MockMvcRequestBuilders.put("/productos/" + id)
-                        .contentType("application/json")
-                        .content("{\"nombre\":\"Laptop Actualizada\",\"stock\":20,\"precio\":1500.0,\"estado\":\"ACTIVO\",\"ubicacion\":\"ALMACEN\",\"categoriaId\":1,\"proveedorId\":1}")
-        ).andReturn();
-
-        assertEquals(HttpStatus.OK.value(), resultActualizar.getResponse().getStatus());
+        mockMvc.perform(
+                get("/productos/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+        .andExpect(status().isOk());
     }
 
     @Test
-    public void testBuscarProducto_RespuestaCorrecta() throws Exception {
+    void buscarProductoInexistente() throws Exception {
 
-        MvcResult resultCrear = mockMvc.perform(
-                MockMvcRequestBuilders.post("/productos")
-                        .contentType("application/json")
-                        .content("{\"nombre\":\"Laptop\",\"stock\":10,\"precio\":1500.0,\"estado\":\"ACTIVO\",\"ubicacion\":\"ALMACEN\",\"categoriaId\":1,\"proveedorId\":1}")
-        ).andReturn();
+        when(productoService.buscarPorId(99L)).thenReturn(null);
 
-        String response = resultCrear.getResponse().getContentAsString();
-
-        String id = response.substring(
-                response.indexOf("\"id\":") + 5,
-                response.indexOf(",", response.indexOf("\"id\":"))
-        ).trim();
-
-        MvcResult resultBuscar = mockMvc.perform(
-                MockMvcRequestBuilders.get("/productos/" + id)
-        ).andReturn();
-
-        assertEquals(HttpStatus.OK.value(), resultBuscar.getResponse().getStatus());
+        mockMvc.perform(
+                get("/productos/99")
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+        .andExpect(status().isNotFound());
     }
 
+    @Test
+    void actualizarProductoExistente() throws Exception {
+
+        Producto producto = new Producto();
+        producto.setId(1L);
+
+        when(productoService.actualizar(
+                org.mockito.ArgumentMatchers.eq(1L),
+                org.mockito.ArgumentMatchers.any(Producto.class)
+        )).thenReturn(producto);
+
+        mockMvc.perform(
+                put("/productos/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "nombre":"Monitor Gamer",
+                                    "precio":900,
+                                    "stock":5
+                                }
+                                """)
+        )
+        .andExpect(status().isOk());
+    }
+
+    @Test
+    void actualizarProductoInexistente() throws Exception {
+
+        when(productoService.actualizar(
+                org.mockito.ArgumentMatchers.eq(99L),
+                org.mockito.ArgumentMatchers.any(Producto.class)
+        )).thenReturn(null);
+
+        mockMvc.perform(
+                put("/productos/99")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                    "nombre":"Producto Fantasma",
+                                    "precio":100,
+                                    "stock":1
+                                }
+                                """)
+        )
+        .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void eliminarProductoExistente() throws Exception {
+
+        when(productoService.eliminar(1L)).thenReturn(true);
+
+        mockMvc.perform(
+                delete("/productos/1")
+        )
+        .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void eliminarProductoInexistente() throws Exception {
+
+        when(productoService.eliminar(99L)).thenReturn(false);
+
+        mockMvc.perform(
+                delete("/productos/99")
+        )
+        .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void aumentarStock() throws Exception {
+
+        Producto producto = new Producto();
+        producto.setId(1L);
+
+        when(productoService.aumentarStock(1L, 5)).thenReturn(producto);
+
+        mockMvc.perform(
+                patch("/productos/1/aumentar?cantidad=5")
+                        .contentType(MediaType.APPLICATION_JSON)
+        )
+        .andExpect(status().isOk());
+    }
+
+    @Test
+    void aumentarStockInvalido() throws Exception {
+
+        when(productoService.aumentarStock(1L, -1)).thenReturn(null);
+
+        mockMvc.perform(
+                patch("/productos/1/aumentar?cantidad=-1")
+        )
+        .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void disminuirStock() throws Exception {
+
+        Producto producto = new Producto();
+        producto.setId(1L);
+
+        when(productoService.disminuirStock(1L, 2)).thenReturn(producto);
+
+        mockMvc.perform(
+                patch("/productos/1/disminuir?cantidad=2")
+        )
+        .andExpect(status().isOk());
+    }
+
+    @Test
+    void disminuirStockInvalido() throws Exception {
+
+        when(productoService.disminuirStock(1L, 999)).thenReturn(null);
+
+        mockMvc.perform(
+                patch("/productos/1/disminuir?cantidad=999")
+        )
+        .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void listarProductosBajoStock() throws Exception {
+
+        when(productoService.listarBajoStock(5))
+                .thenReturn(new ArrayList<>());
+
+        mockMvc.perform(
+                get("/productos/bajo-stock?limite=5")
+        )
+        .andExpect(status().isOk());
+    }
 }

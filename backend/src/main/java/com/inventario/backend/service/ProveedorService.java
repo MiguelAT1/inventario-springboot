@@ -1,53 +1,81 @@
 package com.inventario.backend.service;
 
 import com.inventario.backend.model.Proveedor;
+import com.inventario.backend.repository.ProveedorRepository;
+
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class ProveedorService {
 
-    private final List<Proveedor> proveedores = new ArrayList<>();
-    private Long contadorId = 3L;
+    private final ProveedorRepository proveedorRepository;
 
-    public ProveedorService() {
-        proveedores.add(new Proveedor(1L, "Tech Import", "999111222", "tech@correo.com", "Lima"));
-        proveedores.add(new Proveedor(2L, "CompuMarket", "988777666", "ventas@compu.com", "Arequipa"));
-    }
-
-    public List<Proveedor> listar() {
-        return proveedores;
-    }
-
-    public Proveedor buscarPorId(Long id) {
-        return proveedores.stream()
-                .filter(p -> p.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+    public ProveedorService(ProveedorRepository proveedorRepository) {
+        this.proveedorRepository = proveedorRepository;
     }
 
     public Proveedor crear(Proveedor proveedor) {
-        proveedor.setId(contadorId++);
-        proveedores.add(proveedor);
-        return proveedor;
+
+        validar(proveedor);
+
+        return proveedorRepository.save(proveedor);
     }
 
-    public Proveedor actualizar(Long id, Proveedor proveedorActualizado) {
-        for (Proveedor p : proveedores) {
-            if (p.getId().equals(id)) {
-                p.setNombre(proveedorActualizado.getNombre());
-                p.setTelefono(proveedorActualizado.getTelefono());
-                p.setCorreo(proveedorActualizado.getCorreo());
-                p.setDireccion(proveedorActualizado.getDireccion());
-                return p;
-            }
+    public List<Proveedor> listar() {
+
+        return proveedorRepository.findAll();
+    }
+
+    public Proveedor buscarPorId(Long id) {
+
+        return proveedorRepository.findById(id).orElse(null);
+    }
+
+    public Proveedor actualizar(Long id, Proveedor nuevo) {
+
+        Proveedor proveedor = buscarPorId(id);
+
+        if (proveedor == null) {
+            return null;
         }
-        return null;
+
+        validar(nuevo);
+
+        proveedor.setNombre(nuevo.getNombre());
+        proveedor.setTelefono(nuevo.getTelefono());
+        proveedor.setCorreo(nuevo.getCorreo());
+        proveedor.setDireccion(nuevo.getDireccion());
+
+        return proveedorRepository.save(proveedor);
     }
 
     public boolean eliminar(Long id) {
-        return proveedores.removeIf(p -> p.getId().equals(id));
+
+        Proveedor proveedor = buscarPorId(id);
+
+        if (proveedor == null) {
+            return false;
+        }
+
+        proveedorRepository.deleteById(id);
+
+        return true;
+    }
+
+    private void validar(Proveedor proveedor) {
+
+        if (proveedor.getNombre() == null || proveedor.getNombre().trim().isEmpty()) {
+            throw new RuntimeException("El nombre es obligatorio");
+        }
+
+        if (proveedor.getTelefono() == null || proveedor.getTelefono().trim().isEmpty()) {
+            throw new RuntimeException("El teléfono es obligatorio");
+        }
+
+        if (proveedor.getCorreo() == null || proveedor.getCorreo().trim().isEmpty()) {
+            throw new RuntimeException("El correo es obligatorio");
+        }
     }
 }

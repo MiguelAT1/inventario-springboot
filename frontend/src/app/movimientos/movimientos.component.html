@@ -1,0 +1,47 @@
+<h1>Movimientos</h1>
+<button routerLink="/productos" class="primary">Volver a Productos</button>
+<div *ngIf="mensaje" class="message">{{ mensaje }}</div>
+<form (ngSubmit)="registrarEntrada()">
+  <h2>Registrar movimiento</h2>
+  <label>
+    Producto
+    <select name="productoId" [(ngModel)]="movimientoForm.productoId" required>
+      <option value="0">Selecciona producto</option>
+      <option *ngFor="let producto of productos" [value]="producto.id">{{ producto.nombre }}</option>
+    </select>
+  </label>
+
+  <label>
+    Cantidad
+    <input name="cantidad" type="number" [(ngModel)]="movimientoForm.cantidad" min="1" required />
+  </label>
+
+  <label>
+    Observación
+    <textarea name="observacion" rows="2" [(ngModel)]="movimientoForm.observacion"></textarea>
+  </label>
+
+  <button class="primary" type="button" (click)="registrarEntrada()">Entrada</button>
+  <button class="danger" type="button" (click)="registrarSalida()">Salida</button>
+</form>
+
+<table *ngIf="movimientos.length > 0">
+  <thead>
+    <tr>
+      <th>Tipo</th>
+      <th>Cantidad</th>
+      <th>Producto</th>
+      <th>Fecha</th>
+      <th>Observación</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let movimiento of movimientos">
+      <td>{{ movimiento.tipo }}</td>
+      <td>{{ movimiento.cantidad }}</td>
+      <td>{{ movimiento.producto?.nombre }}</td>
+      <td>{{ movimiento.fecha }}</td>
+      <td>{{ movimiento.observacion }}</td>
+    </tr>
+  </tbody>
+</table>
